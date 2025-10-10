@@ -2,7 +2,7 @@
 # folder or any sub folder it load automaticaly this code
 
 from fastapi import FastAPI
-from book.routes import book_router
+from .book.routes import book_router
 
 version = "v1"
 
@@ -13,4 +13,4 @@ app = FastAPI(
 )
 
 
-app.include_router(book_router, prefix=f"api/{version}/book")
+app.include_router(book_router, prefix=f"/api/{version}/book")

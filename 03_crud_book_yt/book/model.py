@@ -1,4 +1,4 @@
-from book.schemas import Book
+from .schemas import Book
 
 books: list[Book] = [
     Book(id=1,
