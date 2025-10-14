@@ -2,10 +2,10 @@ from fastapi import APIRouter, status, HTTPException
 from .model import books
 from .schemas import Book, BaseBook
 
-book_router = APIRouter()
+router = APIRouter()
 
 
-@book_router.get(
+@router.get(
     "/",
     response_model=dict[str, list[Book]],
     status_code=status.HTTP_200_OK
@@ -14,7 +14,7 @@ async def get_all_books() -> dict[str, list[Book]]:
     return {"books": books}
 
 
-@book_router.get(
+@router.get(
     "/{book_id}",
     response_model=dict[str, Book],
     status_code=status.HTTP_200_OK
@@ -29,7 +29,7 @@ async def get_book(book_id: int) -> dict[str, Book]:
     )
 
 
-@book_router.post(
+@router.post(
     "/",
     response_model=dict[str, Book],
     status_code=status.HTTP_201_CREATED
@@ -40,7 +40,7 @@ async def create_book(book_data: Book) -> dict[str, Book]:
     return {"book": book_data}
 
 
-@book_router.put(
+@router.put(
     "/{book_id}",
     response_model=dict[str, Book],
     status_code=status.HTTP_200_OK
@@ -68,7 +68,7 @@ async def update_book(book_id: int, book_data: BaseBook) -> dict:
     )
 
 
-@book_router.delete(
+@router.delete(
     "/{book_id}",
     # response_model=dict[str, Book],
     status_code=status.HTTP_204_NO_CONTENT
