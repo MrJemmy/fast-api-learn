@@ -9,3 +9,10 @@ engine = AsyncEngine(
         echo=True
     )
 )
+
+
+async def init_db():
+    async with engine.begin() as conn:
+        statement = "SELECT 'hello';"
+        result = await conn.execute(statement)
+        print(result.all())

@@ -4,8 +4,16 @@
 from fastapi import FastAPI
 from .book import router as book_router
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
+from .db.config import init_db
 
 version = "v1"
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await init_db()
+    yield
 
 app = FastAPI(
     title="Book CRUD",
