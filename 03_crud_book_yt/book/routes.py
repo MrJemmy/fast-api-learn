@@ -1,8 +1,12 @@
-from fastapi import APIRouter, status, HTTPException
-from .model import books
-from .schemas import Book, BaseBook
+from fastapi import APIRouter, status, HTTPException, Depends
+from .model import Book
+from .schemas import BaseBook
+from ..db.config import get_session
+from sqlmodel.ext.asyncio.session import AsyncSession
+from .service import BookService
 
 router = APIRouter()
+book_service = BookService()
 
 
 @router.get(
@@ -10,7 +14,8 @@ router = APIRouter()
     response_model=dict[str, list[Book]],
     status_code=status.HTTP_200_OK
 )
-async def get_all_books() -> dict[str, list[Book]]:
+async def get_all_books(session: AsyncSession = Depends(get_session)):
+    books = book_service.get_books(session)
     return {"books": books}
 
 
@@ -19,10 +24,10 @@ async def get_all_books() -> dict[str, list[Book]]:
     response_model=dict[str, Book],
     status_code=status.HTTP_200_OK
 )
-async def get_book(book_id: int) -> dict[str, Book]:
-    for book in books:
-        if book.id == book_id:
-            return {"book": book}
+async def get_book(book_id: int, session: AsyncSession = Depends(get_session)):
+    book = book_service.get_book(session, book_id)
+    if book:
+        return {"book": book}
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail="Book not found"

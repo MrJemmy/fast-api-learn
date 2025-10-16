@@ -18,7 +18,8 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Book CRUD",
     description="A REST API for a book review web service",
-    version=version
+    version=version,
+    lifespan=lifespan,
 )
 origins = ["*"]
 
