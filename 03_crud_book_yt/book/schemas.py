@@ -9,9 +9,9 @@ class BaseBook(BaseModel):
     published_date: datetime
     page_count: int
     language: str
-    created_at: datetime
-    updated_at: datetime
 
 
 class Book(BaseBook):
     id: int
+    created_at: datetime
+    updated_at: datetime

@@ -7,12 +7,12 @@ from sqlmodel import select
 class BookService:
     async def get_books(self, session: AsyncSession):
         statement = select(Book)
-        result = await session.exec(statement)
+        result = await session.execute(statement)
         return result.all()
 
     async def get_book(self, session: AsyncSession, book_id: int):
         statement = select(Book).where(Book.id == book_id)
-        result = await session.exec(statement)
+        result = await session.execute(statement)
         book = result.all()
         return book if book else None
 
