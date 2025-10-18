@@ -1,5 +1,6 @@
 from typing import Optional, ClassVar
-from sqlmodel import SQLModel, Field, Column, DateTime
+from sqlmodel import SQLModel, Field, Column, DateTime, Relationship
+from ..auth.model import User
 from sqlalchemy.sql import func
 from datetime import datetime
 import pytz
@@ -18,6 +19,7 @@ class Book(SQLModel, table=True):
         DateTime(timezone=True), nullable=False))
     page_count: int = Field(gt=0)
     language: str
+    user_id: int = Field(foreign_key="users.id", index=True, nullable=False)
     created_at: datetime = Field(
         default_factory=lambda: datetime.now(TIMEZONE),
         sa_column=Column(DateTime(timezone=True), default=func.now())
@@ -27,6 +29,8 @@ class Book(SQLModel, table=True):
         sa_column=Column(DateTime(timezone=True),
                          default=func.now(), onupdate=func.now())
     )
+
+    owner: User = Relationship(back_populates="books")
 
     def __repr__(self):
         return f"Book(id={self.id}, title={self.title})"
