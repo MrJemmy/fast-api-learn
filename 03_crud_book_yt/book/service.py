@@ -8,13 +8,13 @@ class BookService:
     async def get_books(self, session: AsyncSession):
         statement = select(Book)
         result = await session.execute(statement)
-        return result.all()
+        return result.scalars().all()
 
     async def get_book(self, session: AsyncSession, book_id: int):
         statement = select(Book).where(Book.id == book_id)
         result = await session.execute(statement)
-        book = result.all()
-        return book if book else None
+        book = result.scalars().one_or_none()
+        return book
 
     async def create_book(self, session: AsyncSession, book_data: BaseBook):
         book_data_dict = book_data.model_dump()

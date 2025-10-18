@@ -4,6 +4,7 @@ from .schemas import BaseBook
 from ..db.config import get_session
 from sqlmodel.ext.asyncio.session import AsyncSession
 from .service import BookService
+from typing import List
 
 router = APIRouter()
 book_service = BookService()
@@ -11,11 +12,12 @@ book_service = BookService()
 
 @router.get(
     "/",
-    response_model=dict[str, list[Book]],
+    response_model=dict[str, List[Book]],
     status_code=status.HTTP_200_OK
 )
 async def get_all_books(session: AsyncSession = Depends(get_session)):
     books = await book_service.get_books(session)
+    print("books :", books)
     return {"books": books}
 
 

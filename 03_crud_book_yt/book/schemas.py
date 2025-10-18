@@ -11,7 +11,7 @@ class BaseBook(BaseModel):
     language: str
 
 
-class Book(BaseBook):
+class BookSchema(BaseBook):
     id: int
     created_at: datetime
     updated_at: datetime

@@ -15,7 +15,7 @@ engine = AsyncEngine(
 async def init_db():
     async with engine.begin() as conn:
         from ..book.model import Book  # noqa: F401
-        await conn.run_sync(SQLModel.metadata.create_all)
+        # await conn.run_sync(SQLModel.metadata.create_all)
         # statement = text("SELECT 'hello';")
         # result = await conn.execute(statement)
         # print("result.all() : ", result.all())
