@@ -1,9 +1,10 @@
 from typing import Optional, ClassVar
 from sqlmodel import SQLModel, Field, Column, DateTime, Relationship
-from ..auth.model import User
 from sqlalchemy.sql import func
 from datetime import datetime
 import pytz
+
+from app.api.user.model import User
 
 TIMEZONE = pytz.timezone("Asia/Kolkata")
 

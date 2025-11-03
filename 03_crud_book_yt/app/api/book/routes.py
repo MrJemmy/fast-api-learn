@@ -1,10 +1,11 @@
 from fastapi import APIRouter, status, HTTPException, Depends
-from .model import Book
-from .schemas import BaseBook
-from ..db.config import get_session
-from sqlmodel.ext.asyncio.session import AsyncSession
-from .service import BookService
+from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
+
+from app.db.config import get_session
+from app.api.book.model import Book
+from app.api.book.schemas import BaseBook
+from app.api.book.services import BookService
 
 router = APIRouter()
 book_service = BookService()
@@ -27,7 +28,7 @@ async def get_all_books(session: AsyncSession = Depends(get_session)):
     status_code=status.HTTP_200_OK
 )
 async def get_book(book_id: int, session: AsyncSession = Depends(get_session)):
-    book = await book_service.get_book(session, book_id)
+    book = await book_service.get_book(book_id, session)
     if book:
         return {"book": book}
     raise HTTPException(
@@ -45,7 +46,7 @@ async def create_book(
         book_data: BaseBook,
         session: AsyncSession = Depends(get_session)):
     # new_book = book_data.model_dump()
-    book = await book_service.create_book(session, book_data)
+    book = await book_service.create_book(book_data, session)
     return {"book": book}
 
 
@@ -59,7 +60,7 @@ async def update_book(
         book_data: BaseBook,
         session: AsyncSession = Depends(get_session)):
     updated_book = await book_service.update_book(
-        session, book_id, book_data)
+        book_id, book_data, session)
     if updated_book:
         return {"book": updated_book}
     raise HTTPException(
@@ -76,7 +77,7 @@ async def delete_book(
     book_id: int,
     session: AsyncSession = Depends(get_session)
 ) -> None:
-    deleted_book = await book_service.delete_book(session, book_id)
+    deleted_book = await book_service.delete_book(book_id, session)
     if deleted_book:
         return
     raise HTTPException(

@@ -1,7 +1,8 @@
-from sqlmodel.ext.asyncio.session import AsyncSession
-from .model import Book
-from .schemas import BaseBook
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
+
+from app.api.book.model import Book
+from app.api.book.schemas import BaseBook
 
 
 class BookService:
@@ -10,13 +11,13 @@ class BookService:
         result = await session.execute(statement)
         return result.scalars().all()
 
-    async def get_book(self, session: AsyncSession, book_id: int):
+    async def get_book(self, book_id: int, session: AsyncSession):
         statement = select(Book).where(Book.id == book_id)
         result = await session.execute(statement)
         book = result.scalars().one_or_none()
         return book
 
-    async def create_book(self, session: AsyncSession, book_data: BaseBook):
+    async def create_book(self, book_data: BaseBook, session: AsyncSession):
         book_data_dict = book_data.model_dump()
         new_book = Book(**book_data_dict)
         session.add(new_book)
@@ -24,9 +25,9 @@ class BookService:
         return new_book
 
     async def update_book(
-        self, session: AsyncSession, book_id: int, book_data: BaseBook
+        self, book_id: int, book_data: BaseBook,  session: AsyncSession
     ):
-        book_to_update = await self.get_book(session, book_id)
+        book_to_update = await self.get_book(book_id, session)
 
         if book_to_update is None:
             return None
@@ -40,8 +41,8 @@ class BookService:
 
         return book_to_update
 
-    async def delete_book(self, session: AsyncSession, book_id: int):
-        book_to_delete = await self.get_book(session, book_id)
+    async def delete_book(self, book_id: int,  session: AsyncSession):
+        book_to_delete = await self.get_book(book_id, session)
 
         if book_to_delete is None:
             return None
