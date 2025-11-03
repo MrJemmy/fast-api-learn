@@ -2,17 +2,21 @@ from fastapi import APIRouter
 
 router = APIRouter()
 
+
 @router.get("/get_all")
 def get_users():
     return {"message": "Users list"}
+
 
 @router.get("/get_one")
 def get_user():
     return {"message": "User details"}
 
+
 @router.get("/update")
 def update_user():
     return {"message": "User details"}
+
 
 @router.get("/delete")
 def delete_user():
@@ -24,7 +28,7 @@ def delete_user():
 
 # @router.post("/profile/update")
 # def update_profile():
-#     return {"message": "User profile updated"}  
+#     return {"message": "User profile updated"}
 
 # @router.post("/profile/upload-avatar")
 # def upload_avatar():
@@ -52,6 +56,4 @@ def delete_user():
 
 # @router.post("/notifications/clear")
 # def clear_notifications():
-#     return {"message": "Notifications cleared"} 
-
-
+#     return {"message": "Notifications cleared"}

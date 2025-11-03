@@ -6,6 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 from app.api.book import router as book_router
+from app.api.user import router as user_router
+from app.api.auth import router as auth_router
 from app.db.config import init_db
 
 version = "v1"
@@ -27,3 +29,5 @@ origins = ["*"]
 app.add_middleware(CORSMiddleware, allow_origins=origins)
 
 app.include_router(book_router, prefix=f"/api/{version}/book")
+app.include_router(auth_router, prefix=f"/api/{version}/auth")
+app.include_router(user_router, prefix=f"/api/{version}/user")
