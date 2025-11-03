@@ -12,13 +12,14 @@ TIMEZONE = pytz.timezone("Asia/Kolkata")
 if TYPE_CHECKING:
     from app.api.book.model import Book
 
+
 class User(SQLModel, table=True):
     __tablename__: ClassVar[str] = "users"  # type: ignore
 
     id: Optional[int] = Field(default=None, primary_key=True)
 
     email: str = Field(nullable=False, unique=True, index=True)
-    username: str = Field(nullable=False, unique=True, index=True) 
+    username: str = Field(nullable=False, unique=True, index=True)
     password: str = Field(nullable=False)
 
     created_at: datetime = Field(
@@ -32,7 +33,7 @@ class User(SQLModel, table=True):
     )
 
     books: List["Book"] = Relationship(back_populates="owner")
-    
+
     is_deleted: bool = Field(default=False, nullable=False)
 
     def __repr__(self):
