@@ -2,4 +2,6 @@ from pydantic import BaseModel
 
 
 class UserUpdateSchema(BaseModel):
-    pass
+    first_name: str
+    last_name: str
+    Address: str

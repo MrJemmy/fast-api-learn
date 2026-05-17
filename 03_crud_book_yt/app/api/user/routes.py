@@ -1,26 +1,97 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, status, HTTPException
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
+from typing import List
+
+from app.db.config import get_session
+
+from app.api.user.services import UserService
+from app.api.user.model import User
+
 
 router = APIRouter()
+userService = UserService()
 
 
-@router.get("/get_all")
-def get_users():
-    return {"message": "Users list"}
+@router.get(
+    "/get_all",
+    response_model=List[User],
+    status_code=status.HTTP_200_OK
+)
+async def get_users(session: AsyncSession = Depends(get_session)):
+    try:
+        users = await userService.get_users(session)
+        return users
+    except SQLAlchemyError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database connection failed : {str(e)}"
+        )
+    except  Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Something went wrong, please try again later: {str(e)}"
+        )
 
 
-@router.get("/get_one")
-def get_user():
-    return {"message": "User details"}
+@router.get(
+    "/get_one",
+    response_model=User,
+    status_code=status.HTTP_200_OK)
+async def get_user(
+        user_id: int,
+        session: AsyncSession = Depends(get_session),
+):
+    try:
+        users = await userService.get_user_by_id(user_id, session)
+        return users
+    except SQLAlchemyError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database connection failed : {str(e)}"
+        )
+    except  Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Something went wrong, please try again later: {str(e)}"
+        )
 
 
-@router.get("/update")
+@router.get(
+        "/update",
+            response_model=User,
+            status_code=status.HTTP_200_OK)
 def update_user():
-    return {"message": "User details"}
+    try:
+        return {"message": "User details"}
+    except SQLAlchemyError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database connection failed : {str(e)}"
+        )
+    except  Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Something went wrong, please try again later: {str(e)}"
+        )
 
 
-@router.get("/delete")
+@router.get("/delete",
+            response_model=User,
+            status_code=status.HTTP_200_OK)
 def delete_user():
-    return {"message": "User details"}
+    try:
+        return {"message": "User details"}
+    except SQLAlchemyError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database connection failed : {str(e)}"
+        )
+    except  Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Something went wrong, please try again later: {str(e)}"
+        )
 
 # @router.get("/profile")
 # def get_profile():

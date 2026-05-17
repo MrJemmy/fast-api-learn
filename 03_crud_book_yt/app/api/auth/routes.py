@@ -1,7 +1,10 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.config import get_session
+
+from app.api.user.model import User
 from app.api.auth.schemas import UserRegisterSchema, UserLoginSchema
 from app.api.auth.services import AuthService
 
@@ -9,30 +12,56 @@ router = APIRouter()
 auth_service = AuthService()
 
 
-@router.post("/register")
+@router.post("/register",
+             response_model=User,
+             status_code=status.HTTP_200_OK)
 async def register_user(
         user_data: UserRegisterSchema,
         session: AsyncSession = Depends(get_session)
 ):
-    if auth_service.username_exists(user_data.username, session):
-        return None
-    if auth_service.email_exists(user_data.email, session):
-        return None
-    user = await auth_service.register_user(user_data, session)
-    return {"message": "User registered successfully", "user": user}
+    try:
+        if auth_service.username_exists(user_data.username, session):
+            return None
+        if auth_service.email_exists(user_data.email, session):
+            return None
+        user = await auth_service.register_user(user_data, session)
+        return user
+    except SQLAlchemyError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database connection failed : {str(e)}"
+        )
+    except  Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Something went wrong, please try again later: {str(e)}"
+        )
 
 
-@router.post("/login")
+@router.post("/login",
+             response_model=User,
+             status_code=status.HTTP_200_OK)
 async def login_user(
         login_data: UserLoginSchema,
         session: AsyncSession = Depends(get_session)
 ):
-    user = await auth_service.login_user(
-        login_data.identifier, login_data.password, session)
-    return {"message": "User logged in successfully", "user": user}
+    try:
+        user = await auth_service.login_user(
+            login_data.identifier, login_data.password, session)
+        return user
+    except SQLAlchemyError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database connection failed : {str(e)}"
+        )
+    except  Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Something went wrong, please try again later: {str(e)}"
+        )
 
 
-@router.post("/logout")
+@router.post("/logout", status_code=status.HTTP_200_OK)
 def logout_user():
     return {"message": "User logged out successfully"}
 

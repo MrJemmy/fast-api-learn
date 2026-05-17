@@ -22,6 +22,12 @@ class User(SQLModel, table=True):
     username: str = Field(nullable=False, unique=True, index=True)
     password: str = Field(nullable=False)
 
+    # added latter on
+    first_name: str = Field(nullable=True)
+    last_name: str = Field(nullable=True)
+    Address: str = Field(nullable=True)
+
+    # created_at: datetime = Field(default_factory=datetime.utcnow) # find solution to conver time based on users timezone
     created_at: datetime = Field(
         default_factory=lambda: datetime.now(TIMEZONE),
         sa_column=Column(DateTime(timezone=True), default=func.now())
