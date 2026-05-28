@@ -1,0 +1,5 @@
+fastapi
+gunicorn
+sqlmodel
+uvicorn
+pydantic-settings

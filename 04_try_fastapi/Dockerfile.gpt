@@ -1,0 +1,52 @@
+# ========= Stage 1: Builder =========
+FROM python:3.13.7-slim AS builder
+
+# Create and use virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Install system dependencies needed for building Python packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libpq-dev \
+    libjpeg-dev \
+    libcairo2 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy only requirements first for better caching
+COPY requirements.txt /tmp/requirements.txt
+
+# Upgrade pip & install Python deps into venv
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r /tmp/requirements.txt
+
+# ========= Stage 2: Runtime =========
+FROM python:3.13.7-slim
+
+# Copy virtual environment from builder
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Minimal runtime dependencies only
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libcairo2 \
+    libpq-dev \
+    libjpeg-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create working directory
+WORKDIR /code
+
+# Copy app code
+COPY ./src /code
+
+# Copy entrypoint script and make it executable
+COPY ./boot/docker-run.sh /opt/run.sh
+RUN chmod +x /opt/run.sh
+
+# Prevent Python from writing pyc files + enable unbuffered logs
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Run the application
+CMD ["/opt/run.sh"]
