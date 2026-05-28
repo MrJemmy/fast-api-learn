@@ -31,12 +31,17 @@ class AuthService:
         await session.commit()
         return new_user
 
-    async def login_user(
-            self, identifier: str, password: str, session: AsyncSession):
+
+    # statement = select(User).where(
+    #             ((User.username == identifier) | (User.email == identifier))
+    #             & (User.is_deleted is False)
+    #         )
+    async def email_login(
+            self, email: str, password: str, session: AsyncSession):
         statement = select(User).where(
-            ((User.username == identifier) | (User.email == identifier))
-            & (User.is_deleted is False)
-        )
+                        (User.email == email)
+                        & (User.is_deleted is False)
+                    )
         result = await session.execute(statement)
         user = result.scalars().one_or_none()
 
@@ -44,3 +49,18 @@ class AuthService:
             return None
 
         return user
+
+    async def username_login(
+            self, username: str, password: str, session: AsyncSession):
+        statement = select(User).where(
+            (User.username == username)
+            & (User.is_deleted is False)
+        )
+        result = await session.execute(statement)
+        user = result.scalars().one_or_none()
+
+        if not user or not verify_password(password, user.password):
+            return None
+
+        return user
+

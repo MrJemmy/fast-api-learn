@@ -3,28 +3,28 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-# from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager
 
 from app.api.book import router as book_router
 from app.api.user import router as user_router
 from app.api.auth import router as auth_router
-# from app.db.config import init_db
+from app.db.config import init_db
 
 version = "v1"
 
 """
 
 """
-# @asynccontextmanager
-# async def lifespan(app: FastAPI):
-#     await init_db()
-#     yield
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await init_db()
+    yield
 
 app = FastAPI(
     title="Book CRUD",
     description="A REST API for a book review web service",
     version=version,
-    # lifespan=lifespan,
+    lifespan=lifespan,
 )
 origins = ["*"]
 

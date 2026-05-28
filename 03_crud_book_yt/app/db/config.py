@@ -1,4 +1,5 @@
 from typing import AsyncGenerator
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import (
     AsyncSession, create_async_engine, async_sessionmaker
 )
@@ -26,11 +27,10 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
 
 
 # 4. DB initializer for startup
-# async def init_db():
-#     async with engine.begin():
-#         pass
-#         # from app.api.book.model import Book  # noqa: F401
-#         # await conn.run_sync(SQLModel.metadata.create_all)
-#         # statement = text("SELECT 'hello';")
-#         # result = await conn.execute(statement)
-#         # print("result.all() : ", result.all())
+async def init_db():
+    try:
+        async with engine.begin() as conn:
+            await conn.execute(text("SELECT 1;"))
+        print("Database connection successful")
+    except Exception as e:
+        print(f"Database connection failed: {e}")

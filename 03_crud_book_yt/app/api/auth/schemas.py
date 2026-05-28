@@ -6,12 +6,11 @@ class UserLoginSchema(BaseModel):
     identifier: str
     password: str
 
-
 class UserRegisterSchema(BaseModel):
     username: str = Field(
         ...,
-        min_length=3,
-        max_length=20,
+        min_length=4,
+        max_length=26,
         pattern="^[a-zA-Z0-9_]+$",
         description=(
             "Username must be between 8 and 128 characters long.")
@@ -52,3 +51,10 @@ class UserRegisterSchema(BaseModel):
             raise ValueError(
                 "Username can only contain letters, numbers, and underscores.")
         return value
+
+class TokenResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+
+class TokenRefreshRequest(BaseModel):
+    refresh_token: str

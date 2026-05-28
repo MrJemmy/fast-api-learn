@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.auth.utils import generate_access_token, decode_access_token, generate_refresh_token, hash_token
 from app.db.config import get_session
 
 from app.api.user.model import User
@@ -46,8 +47,26 @@ async def login_user(
         session: AsyncSession = Depends(get_session)
 ):
     try:
-        user = await auth_service.login_user(
-            login_data.identifier, login_data.password, session)
+        if login_data.identifier is None or login_data.password is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid login data"
+            )
+
+        if "@" in login_data.identifier:
+            user = await auth_service.email_login(
+                login_data.identifier, login_data.password, session)
+        else:
+            user = await auth_service.username_login(
+                login_data.identifier, login_data.password, session)
+
+        if not user:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
+        access_token = generate_access_token(user.id)
+        refresh_token = generate_refresh_token()
+        refresh_hash = hash_token(refresh_token)
+
         return user
     except SQLAlchemyError as e:
         raise HTTPException(
